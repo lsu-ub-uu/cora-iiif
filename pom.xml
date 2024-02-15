@@ -31,10 +31,9 @@
 	<name>Fedora 6+</name>
 
 	<properties>
-		<httphandler.version>2.13.0</httphandler.version>
-		<json.version>3.9.0</json.version>
+		<httphandler.version>2.16-SNAPSHOT</httphandler.version>
 		<testutils.version>1.11.0</testutils.version>
-		<httphandler-spies.version>1.5.0</httphandler-spies.version>
+		<httphandler-spies.version>1.6-SNAPSHOT</httphandler-spies.version>
 	</properties>
 
 	<scm>
@@ -50,12 +49,6 @@
 			<artifactId>httphandler</artifactId>
 			<version>${httphandler.version}</version>
 			<scope>compile</scope>
-		</dependency>
-		<dependency>
-			<groupId>se.uu.ub.cora</groupId>
-			<artifactId>json</artifactId>
-			<version>${json.version}</version>
-			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
