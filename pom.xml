@@ -28,7 +28,7 @@
 	<artifactId>iiif</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Iiif</name>
+	<name>IIIF image API adapter</name>
 
 	<properties>
 		<httphandler.version>2.16-SNAPSHOT</httphandler.version>
