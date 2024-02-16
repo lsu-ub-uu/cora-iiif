@@ -28,7 +28,7 @@
 	<artifactId>iiif</artifactId>
 	<version>1.0-SNAPSHOT</version>
 	<packaging>jar</packaging>
-	<name>Fedora 6+</name>
+	<name>Iiif</name>
 
 	<properties>
 		<httphandler.version>2.16-SNAPSHOT</httphandler.version>
