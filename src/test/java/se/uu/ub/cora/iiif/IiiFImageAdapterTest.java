@@ -38,7 +38,7 @@ public class IiiFImageAdapterTest {
 	private static final String REGION = "someRegion";
 	private static final String IDENTIFIER = "someIdentifier";
 	private static final String DATA_DIVIDER = "someDataDivider";
-	IiiFImageAdapter adapter;
+	IiifImageAdapterImp adapter;
 	private HttpHandlerFactorySpy httpHandlerFactory;
 	private IiifImageParameters iiifImageParameters;
 	private HttpHandlerSpy httpHandler;
@@ -53,7 +53,7 @@ public class IiiFImageAdapterTest {
 		iiifImageParameters = new IiifImageParameters(DATA_DIVIDER, IDENTIFIER, REGION, SIZE,
 				ROTATION, QUALITY, FORMAT);
 
-		adapter = new IiiFImageAdapter(IIIF_SERVER_URL, httpHandlerFactory);
+		adapter = new IiifImageAdapterImp(IIIF_SERVER_URL, httpHandlerFactory);
 
 	}
 

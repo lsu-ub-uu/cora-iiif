@@ -24,16 +24,17 @@ import java.util.Optional;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
-public class IiiFImageAdapter {
+public class IiifImageAdapterImp implements IiifImageAdapter {
 
 	private HttpHandlerFactory httpHandlerFactory;
 	private String iiifServerUrl;
 
-	public IiiFImageAdapter(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory) {
+	public IiifImageAdapterImp(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory) {
 		this.iiifServerUrl = iiifServerUrl;
 		this.httpHandlerFactory = httpHandlerFactory;
 	}
 
+	@Override
 	public IiifImageResponse requestImage(IiifImageParameters iiifImageParameters) {
 		try {
 			return tryToRequestImage(iiifImageParameters);

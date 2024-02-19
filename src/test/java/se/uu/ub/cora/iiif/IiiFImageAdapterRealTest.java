@@ -2,12 +2,6 @@ package se.uu.ub.cora.iiif;
 
 import static org.testng.Assert.assertEquals;
 
-import java.net.URI;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.time.Duration;
-
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.httphandler.HttpHandler;
@@ -24,7 +18,7 @@ public class IiiFImageAdapterRealTest {
 
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
 
-		IiiFImageAdapter iiiFImageAdapter = new IiiFImageAdapter(HTTP_LOCALHOST_39080_IIIF,
+		IiifImageAdapterImp iiiFImageAdapter = new IiifImageAdapterImp(HTTP_LOCALHOST_39080_IIIF,
 				httpHandlerFactory);
 
 		IiifImageParameters parameters = new IiifImageParameters("systemOne",
@@ -55,34 +49,34 @@ public class IiiFImageAdapterRealTest {
 	// to run
 
 	// Call to IIPserver works and the file is transfered when using only HTTP_1_1
-	@Test(enabled = false)
-	public void testUsingHTTP_1_1() throws Exception {
-		HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
-				.connectTimeout(Duration.ofSeconds(10)).build();
-
-		HttpRequest request = HttpRequest.newBuilder().uri(new URI(
-				"http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg"))
-				.GET().build();
-
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-		System.out.println("Response Code: " + response.statusCode());
-		System.out.println("Response Body: " + response.body());
-	}
+	// @Test(enabled = false)
+	// public void testUsingHTTP_1_1() throws Exception {
+	// HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
+	// .connectTimeout(Duration.ofSeconds(10)).build();
+	//
+	// HttpRequest request = HttpRequest.newBuilder().uri(new URI(
+	// "http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg"))
+	// .GET().build();
+	//
+	// HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	//
+	// System.out.println("Response Code: " + response.statusCode());
+	// System.out.println("Response Body: " + response.body());
+	// }
 
 	// Call to IIPserver hangs when swithcing protocol from HTTP_1_1 to HTTP_2
-	@Test(enabled = false)
-	public void testUsingHTTP_2() throws Exception {
-		HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2)
-				.connectTimeout(Duration.ofSeconds(10)).build();
-
-		HttpRequest request = HttpRequest.newBuilder().uri(new URI(
-				"http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg"))
-				.GET().build();
-
-		HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-
-		System.out.println("Response Code: " + response.statusCode());
-		System.out.println("Response Body: " + response.body());
-	}
+	// @Test(enabled = false)
+	// public void testUsingHTTP_2() throws Exception {
+	// HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_2)
+	// .connectTimeout(Duration.ofSeconds(10)).build();
+	//
+	// HttpRequest request = HttpRequest.newBuilder().uri(new URI(
+	// "http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg"))
+	// .GET().build();
+	//
+	// HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
+	//
+	// System.out.println("Response Code: " + response.statusCode());
+	// System.out.println("Response Body: " + response.body());
+	// }
 }
