@@ -21,6 +21,10 @@ package se.uu.ub.cora.iiif;
 import java.util.Map;
 import java.util.Optional;
 
+import se.uu.ub.cora.binary.BinaryException;
+import se.uu.ub.cora.binary.iiif.IiifImageAdapter;
+import se.uu.ub.cora.binary.iiif.IiifImageParameters;
+import se.uu.ub.cora.binary.iiif.IiifImageResponse;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
@@ -39,7 +43,7 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 		try {
 			return tryToRequestImage(iiifImageParameters);
 		} catch (Exception e) {
-			throw IiiFImageException
+			throw BinaryException
 					.withMessageAndException("Error while requesting an image from server with id: "
 							+ iiifImageParameters.identifier(), e);
 		}
@@ -55,6 +59,7 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 		String requestUrl = buildRequestUrl(iiifImageParameters);
 		HttpHandler httpHandler = httpHandlerFactory.factor(requestUrl);
 		httpHandler.setRequestMethod("GET");
+		// TODO: Set ALL headers from external call
 		httpHandler.setRequestProperty("Accept", "image/avif,image/webp,*/*");
 		return httpHandler;
 	}
@@ -112,5 +117,19 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 	private IiifImageResponse returnOk(HttpHandler httpHandler, int responseCode) {
 		return new IiifImageResponse(responseCode, httpHandler.getResponseHeaders(),
 				Optional.of(httpHandler.getResponseBinary()), Optional.empty());
+	}
+
+	@Override
+	public IiifImageResponse requestInformation(String dataDivider, String identifier) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	String onlyForTestGetIiifServerUrl() {
+		return iiifServerUrl;
+	}
+
+	HttpHandlerFactory onlyForTestGetHttpHandlerFactory() {
+		return httpHandlerFactory;
 	}
 }

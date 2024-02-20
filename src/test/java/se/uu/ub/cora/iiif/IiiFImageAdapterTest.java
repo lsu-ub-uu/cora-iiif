@@ -25,8 +25,12 @@ import static org.testng.Assert.fail;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.binary.BinaryException;
+import se.uu.ub.cora.binary.iiif.IiifImageParameters;
+import se.uu.ub.cora.binary.iiif.IiifImageResponse;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerFactorySpy;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerSpy;
+import se.uu.ub.cora.iiif.IiifImageAdapterImp;
 
 public class IiiFImageAdapterTest {
 
@@ -137,7 +141,7 @@ public class IiiFImageAdapterTest {
 			adapter.requestImage(iiifImageParameters);
 			fail("It should throw an exception");
 		} catch (Exception e) {
-			assertTrue(e instanceof IiiFImageException);
+			assertTrue(e instanceof BinaryException);
 			assertEquals(e.getMessage(),
 					"Error while requesting an image from server with id: " + IDENTIFIER);
 			assertEquals(e.getCause(), runtimeException);

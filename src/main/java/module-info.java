@@ -1,3 +1,5 @@
+import se.uu.ub.cora.iiif.IiifImageInstanceProviderImp;
+
 /*
  * Copyright 2024 Uppsala University Library
  *
@@ -14,7 +16,11 @@
  * You should have received a copy of the GNU General Public License along with Cora. If not, see
  * <http://www.gnu.org/licenses/>.
  */
-module se.uu.ub.cora.iiif {
+module se.uu.ub.cora.iiifadapter {
 	requires se.uu.ub.cora.httphandler;
+	requires se.uu.ub.cora.initialize;
+	requires se.uu.ub.cora.binary;
+
+	provides se.uu.ub.cora.binary.iiif.IiifImageInstanceProvider with IiifImageInstanceProviderImp;
 
 }

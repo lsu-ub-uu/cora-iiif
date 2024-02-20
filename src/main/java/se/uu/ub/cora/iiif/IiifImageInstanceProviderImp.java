@@ -18,28 +18,24 @@
  */
 package se.uu.ub.cora.iiif;
 
-import static org.testng.Assert.assertEquals;
+import se.uu.ub.cora.binary.iiif.IiifImageAdapter;
+import se.uu.ub.cora.binary.iiif.IiifImageInstanceProvider;
+import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
+import se.uu.ub.cora.initialize.SettingsProvider;
 
-import java.io.ByteArrayInputStream;
-import java.util.Map;
-import java.util.Optional;
+public class IiifImageInstanceProviderImp implements IiifImageInstanceProvider {
 
-import org.testng.annotations.Test;
+	@Override
+	public int getOrderToSelectImplementionsBy() {
+		return 0;
+	}
 
-public class IiifImageResponseTest {
+	@Override
+	public IiifImageAdapter getIiifImageAdapter() {
+		HttpHandlerFactoryImp httpHandlerFactory = new HttpHandlerFactoryImp();
 
-	@Test
-	public void testIiifImageResponse() throws Exception {
-		ByteArrayInputStream image = new ByteArrayInputStream("someImage".getBytes());
-		Map<String, Object> headers = Map.of("someKey", "someValue");
-
-		IiifImageResponse record = new IiifImageResponse(200, headers, Optional.of(image),
-				Optional.of("someError"));
-
-		assertEquals(record.status(), 200);
-		assertEquals(record.headers(), headers);
-		assertEquals(record.image().get(), image);
-		assertEquals(record.errorMessage().get(), "someError");
+		return new IiifImageAdapterImp(SettingsProvider.getSetting("imageServerUrl"),
+				httpHandlerFactory);
 	}
 
 }

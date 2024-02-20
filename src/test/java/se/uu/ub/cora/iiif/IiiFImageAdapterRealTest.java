@@ -4,9 +4,11 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.binary.iiif.IiifImageParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
+import se.uu.ub.cora.iiif.IiifImageAdapterImp;
 
 public class IiiFImageAdapterRealTest {
 

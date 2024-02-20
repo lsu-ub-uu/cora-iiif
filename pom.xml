@@ -31,9 +31,12 @@
 	<name>IIIF image API adapter</name>
 
 	<properties>
+		<contentanalyzer.version>2.0-SNAPSHOT</contentanalyzer.version>
 		<httphandler.version>2.16-SNAPSHOT</httphandler.version>
+		<logger.version>2.10.0</logger.version>
 		<testutils.version>1.11.0</testutils.version>
 		<httphandler-spies.version>1.6-SNAPSHOT</httphandler-spies.version>
+		<logger-spies.version>1.6-SNAPSHOT</logger-spies.version>
 	</properties>
 
 	<scm>
@@ -46,9 +49,20 @@
 	<dependencies>
 		<dependency>
 			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>contentanalyzer</artifactId>
+			<version>${contentanalyzer.version}</version>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
 			<artifactId>httphandler</artifactId>
 			<version>${httphandler.version}</version>
 			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>logger</artifactId>
+			<version>${logger.version}</version>
+			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>org.testng</groupId>
@@ -66,6 +80,12 @@
 			<groupId>se.uu.ub.cora</groupId>
 			<artifactId>httphandler-spies</artifactId>
 			<version>${httphandler-spies.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>logger-spies</artifactId>
+			<version>${logger-spies.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
