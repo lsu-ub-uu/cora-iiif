@@ -119,11 +119,11 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 				Optional.of(httpHandler.getResponseBinary()), Optional.empty());
 	}
 
-	@Override
-	public IiifImageResponse requestInformation(String dataDivider, String identifier) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+	// @Override
+	// public IiifImageResponse requestInformation(String dataDivider, String identifier) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
 
 	String onlyForTestGetIiifServerUrl() {
 		return iiifServerUrl;
