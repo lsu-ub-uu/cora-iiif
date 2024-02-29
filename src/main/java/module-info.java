@@ -21,6 +21,6 @@ module se.uu.ub.cora.iiifadapter {
 	requires se.uu.ub.cora.initialize;
 	requires se.uu.ub.cora.binary;
 
-	provides se.uu.ub.cora.binary.iiif.IiifImageInstanceProvider with IiifImageInstanceProviderImp;
+	provides se.uu.ub.cora.binary.iiif.IiifInstanceProvider with IiifImageInstanceProviderImp;
 
 }

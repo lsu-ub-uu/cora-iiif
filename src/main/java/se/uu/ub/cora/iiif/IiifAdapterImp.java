@@ -22,40 +22,40 @@ import java.util.Map;
 import java.util.Optional;
 
 import se.uu.ub.cora.binary.BinaryException;
-import se.uu.ub.cora.binary.iiif.IiifImageAdapter;
-import se.uu.ub.cora.binary.iiif.IiifImageParameters;
-import se.uu.ub.cora.binary.iiif.IiifImageResponse;
+import se.uu.ub.cora.binary.iiif.IiifAdapter;
+import se.uu.ub.cora.binary.iiif.IiifAdapterResponse;
+import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
-public class IiifImageAdapterImp implements IiifImageAdapter {
+public class IiifAdapterImp implements IiifAdapter {
 
 	private HttpHandlerFactory httpHandlerFactory;
 	private String iiifServerUrl;
 
-	public IiifImageAdapterImp(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory) {
+	public IiifAdapterImp(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory) {
 		this.iiifServerUrl = iiifServerUrl;
 		this.httpHandlerFactory = httpHandlerFactory;
 	}
 
 	@Override
-	public IiifImageResponse requestImage(IiifImageParameters iiifImageParameters) {
+	public IiifAdapterResponse callIiifServer(IiifParameters iiifImageParameters) {
 		try {
 			return tryToRequestImage(iiifImageParameters);
 		} catch (Exception e) {
 			throw BinaryException
 					.withMessageAndException("Error while requesting an image from server with id: "
-							+ iiifImageParameters.identifier(), e);
+							+ iiifImageParameters.uri(), e);
 		}
 	}
 
-	private IiifImageResponse tryToRequestImage(IiifImageParameters iiifImageParameters) {
+	private IiifAdapterResponse tryToRequestImage(IiifParameters iiifImageParameters) {
 		HttpHandler httpHandler = setUpRequest(iiifImageParameters);
 		int responseCode = call(httpHandler);
 		return requestResponse(iiifImageParameters, httpHandler, responseCode);
 	}
 
-	private HttpHandler setUpRequest(IiifImageParameters iiifImageParameters) {
+	private HttpHandler setUpRequest(IiifParameters iiifImageParameters) {
 		String requestUrl = buildRequestUrl(iiifImageParameters);
 		HttpHandler httpHandler = httpHandlerFactory.factor(requestUrl);
 		httpHandler.setRequestMethod("GET");
@@ -64,18 +64,15 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 		return httpHandler;
 	}
 
-	private String buildRequestUrl(IiifImageParameters iiifImageParameters) {
-		return iiifServerUrl + "/" + iiifImageParameters.dataDivider() + "/"
-				+ iiifImageParameters.identifier() + "/" + iiifImageParameters.region() + "/"
-				+ iiifImageParameters.size() + "/" + iiifImageParameters.rotation() + "/"
-				+ iiifImageParameters.quality() + "." + iiifImageParameters.format();
+	private String buildRequestUrl(IiifParameters iiifImageParameters) {
+		return iiifServerUrl + "/" + iiifImageParameters.uri();
 	}
 
 	private int call(HttpHandler httpHandler) {
 		return httpHandler.getResponseCode();
 	}
 
-	private IiifImageResponse requestResponse(IiifImageParameters iiifImageParameters,
+	private IiifAdapterResponse requestResponse(IiifParameters iiifImageParameters,
 			HttpHandler httpHandler, int responseCode) {
 		if (responseNotOk(responseCode)) {
 			return returnNotOk(iiifImageParameters, httpHandler, responseCode);
@@ -87,7 +84,7 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 		return responseCode != 200;
 	}
 
-	private IiifImageResponse returnNotOk(IiifImageParameters iiifImageParameters,
+	private IiifAdapterResponse returnNotOk(IiifParameters iiifImageParameters,
 			HttpHandler httpHandler, int responseCode) {
 		Map<String, Object> responseHeaders = httpHandler.getResponseHeaders();
 		if (responseNotFound(responseCode)) {
@@ -100,23 +97,23 @@ public class IiifImageAdapterImp implements IiifImageAdapter {
 		return responseCode == 404;
 	}
 
-	private IiifImageResponse returnNotFound(IiifImageParameters iiifImageParameters,
-			int responseCode, Map<String, Object> responseHeaders) {
+	private IiifAdapterResponse returnNotFound(IiifParameters iiifImageParameters, int responseCode,
+			Map<String, Object> responseHeaders) {
 		var errorCode = Optional
-				.of("Image with id: " + iiifImageParameters.identifier() + ", could not be found.");
-		return new IiifImageResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
+				.of("Image with path: " + iiifImageParameters.uri() + ", could not be found.");
+		return new IiifAdapterResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
 	}
 
-	private IiifImageResponse returnAnyError(IiifImageParameters iiifImageParameters,
-			int responseCode, Map<String, Object> responseHeaders) {
+	private IiifAdapterResponse returnAnyError(IiifParameters iiifImageParameters, int responseCode,
+			Map<String, Object> responseHeaders) {
 		var errorCode = Optional.of(
 				"Image with id: " + iiifImageParameters.identifier() + ", could not be retrieved");
-		return new IiifImageResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
+		return new IiifAdapterResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
 	}
 
-	private IiifImageResponse returnOk(HttpHandler httpHandler, int responseCode) {
-		return new IiifImageResponse(responseCode, httpHandler.getResponseHeaders(),
-				Optional.of(httpHandler.getResponseBinary()), Optional.empty());
+	private IiifAdapterResponse returnOk(HttpHandler httpHandler, int responseCode) {
+		return new IiifAdapterResponse(responseCode, httpHandler.getResponseHeaders(),
+				httpHandler.getResponseBinary());
 	}
 
 	// @Override

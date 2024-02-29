@@ -26,17 +26,17 @@ import java.util.Map;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.binary.iiif.IiifImageAdapter;
-import se.uu.ub.cora.binary.iiif.IiifImageInstanceProvider;
+import se.uu.ub.cora.binary.iiif.IiifAdapter;
+import se.uu.ub.cora.binary.iiif.IiifInstanceProvider;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
-import se.uu.ub.cora.iiif.IiifImageAdapterImp;
+import se.uu.ub.cora.iiif.IiifAdapterImp;
 import se.uu.ub.cora.iiif.IiifImageInstanceProviderImp;
 import se.uu.ub.cora.initialize.SettingsProvider;
 import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.logger.spies.LoggerFactorySpy;
 
 public class IiifImageInstanceProviderTest {
-	private IiifImageInstanceProvider provider;
+	private IiifInstanceProvider provider;
 
 	private LoggerFactorySpy loggerFactory;
 
@@ -55,7 +55,7 @@ public class IiifImageInstanceProviderTest {
 
 	@Test
 	public void testInstanceOf() throws Exception {
-		assertTrue(provider instanceof IiifImageInstanceProvider);
+		assertTrue(provider instanceof IiifInstanceProvider);
 	}
 
 	@Test
@@ -66,9 +66,9 @@ public class IiifImageInstanceProviderTest {
 	@Test
 	public void getIiifImageAdapter() throws Exception {
 
-		IiifImageAdapterImp iiifImageAdapter = (IiifImageAdapterImp) provider.getIiifImageAdapter();
+		IiifAdapterImp iiifImageAdapter = (IiifAdapterImp) provider.getIiifAdapter();
 
-		assertTrue(iiifImageAdapter instanceof IiifImageAdapter);
+		assertTrue(iiifImageAdapter instanceof IiifAdapter);
 		assertTrue(
 				iiifImageAdapter.onlyForTestGetHttpHandlerFactory() instanceof HttpHandlerFactory);
 		assertEquals(iiifImageAdapter.onlyForTestGetIiifServerUrl(), "someUrl");

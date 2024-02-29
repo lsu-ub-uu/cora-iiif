@@ -18,12 +18,12 @@
  */
 package se.uu.ub.cora.iiif;
 
-import se.uu.ub.cora.binary.iiif.IiifImageAdapter;
-import se.uu.ub.cora.binary.iiif.IiifImageInstanceProvider;
+import se.uu.ub.cora.binary.iiif.IiifAdapter;
+import se.uu.ub.cora.binary.iiif.IiifInstanceProvider;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
 import se.uu.ub.cora.initialize.SettingsProvider;
 
-public class IiifImageInstanceProviderImp implements IiifImageInstanceProvider {
+public class IiifImageInstanceProviderImp implements IiifInstanceProvider {
 
 	@Override
 	public int getOrderToSelectImplementionsBy() {
@@ -31,10 +31,10 @@ public class IiifImageInstanceProviderImp implements IiifImageInstanceProvider {
 	}
 
 	@Override
-	public IiifImageAdapter getIiifImageAdapter() {
+	public IiifAdapter getIiifAdapter() {
 		HttpHandlerFactoryImp httpHandlerFactory = new HttpHandlerFactoryImp();
 
-		return new IiifImageAdapterImp(SettingsProvider.getSetting("imageServerUrl"),
+		return new IiifAdapterImp(SettingsProvider.getSetting("imageServerUrl"),
 				httpHandlerFactory);
 	}
 

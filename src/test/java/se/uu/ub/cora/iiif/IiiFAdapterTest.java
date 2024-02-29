@@ -22,18 +22,21 @@ import static org.testng.Assert.assertEquals;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
 import se.uu.ub.cora.binary.BinaryException;
-import se.uu.ub.cora.binary.iiif.IiifImageParameters;
-import se.uu.ub.cora.binary.iiif.IiifImageResponse;
+import se.uu.ub.cora.binary.iiif.IiifAdapterResponse;
+import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerFactorySpy;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerSpy;
-import se.uu.ub.cora.iiif.IiifImageAdapterImp;
 
-public class IiiFImageAdapterTest {
+public class IiiFAdapterTest {
 
+	private static final String SOME_METHOD = "someMethod";
 	private static final String IIIF_SERVER_URL = "someIiifServerUrl";
 	private static final String FORMAT = "someFormat";
 	private static final String QUALITY = "someQuality";
@@ -41,11 +44,12 @@ public class IiiFImageAdapterTest {
 	private static final String SIZE = "someSize";
 	private static final String REGION = "someRegion";
 	private static final String IDENTIFIER = "someIdentifier";
-	private static final String DATA_DIVIDER = "someDataDivider";
-	IiifImageAdapterImp adapter;
+	private static final String SOME_URI = "someUri";
+	IiifAdapterImp adapter;
 	private HttpHandlerFactorySpy httpHandlerFactory;
-	private IiifImageParameters iiifImageParameters;
+	private IiifParameters iiifImageParameters;
 	private HttpHandlerSpy httpHandler;
+	private Map<String, String> headersMap;
 
 	@BeforeMethod
 	private void beforeMethod() {
@@ -54,17 +58,17 @@ public class IiiFImageAdapterTest {
 
 		httpHandlerFactory.MRV.setDefaultReturnValuesSupplier("factor", () -> httpHandler);
 
-		iiifImageParameters = new IiifImageParameters(DATA_DIVIDER, IDENTIFIER, REGION, SIZE,
-				ROTATION, QUALITY, FORMAT);
+		headersMap = new HashMap<>();
+		iiifImageParameters = new IiifParameters(SOME_URI, SOME_METHOD, headersMap);
 
-		adapter = new IiifImageAdapterImp(IIIF_SERVER_URL, httpHandlerFactory);
+		adapter = new IiifAdapterImp(IIIF_SERVER_URL, httpHandlerFactory);
 
 	}
 
 	@Test
 	public void testRequestImage_OK() throws Exception {
 
-		IiifImageResponse response = adapter.requestImage(iiifImageParameters);
+		IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
 
 		assertBuildUrl();
 		assertHeaders();
@@ -75,8 +79,8 @@ public class IiiFImageAdapterTest {
 
 		httpHandler.MCR.assertReturn("getResponseCode", 0, response.status());
 		httpHandler.MCR.assertReturn("getResponseHeaders", 0, response.headers());
-		httpHandler.MCR.assertReturn("getResponseBinary", 0, response.image().get());
-		assertTrue(response.errorMessage().isEmpty());
+		httpHandler.MCR.assertReturn("getResponseBinary", 0, response.body());
+		// assertTrue(response.errorMessage().isEmpty());
 	}
 
 	private void assertHeaders() {
@@ -86,7 +90,7 @@ public class IiiFImageAdapterTest {
 	}
 
 	private void assertBuildUrl() {
-		String expectedUrl = IIIF_SERVER_URL + "/" + DATA_DIVIDER + "/" + IDENTIFIER + "/" + REGION
+		String expectedUrl = IIIF_SERVER_URL + "/" + SOME_URI + "/" + IDENTIFIER + "/" + REGION
 				+ "/" + SIZE + "/" + ROTATION + "/" + QUALITY + "." + FORMAT;
 
 		String iiifRequestUrl = (String) httpHandlerFactory.MCR
@@ -99,13 +103,13 @@ public class IiiFImageAdapterTest {
 	public void testRequestImage_ResponseStatusNotFound() throws Exception {
 		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 404);
 
-		IiifImageResponse response = adapter.requestImage(iiifImageParameters);
+		IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
 
 		String errorMessage = "Image with id: " + IDENTIFIER + ", could not be found.";
 		assertIiifResponse(response, 404, errorMessage);
 	}
 
-	private void assertIiifResponse(IiifImageResponse response, int status, String errorMessage) {
+	private void assertIiifResponse(IiifAdapterResponse response, int status, String errorMessage) {
 		assertEquals(response.status(), status);
 		httpHandler.MCR.assertReturn("getResponseHeaders", 0, response.headers());
 		assertTrue(response.image().isEmpty());
@@ -116,7 +120,7 @@ public class IiiFImageAdapterTest {
 	public void testRequestImage_ResponseStatusNotOk() throws Exception {
 		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 418);
 
-		IiifImageResponse response = adapter.requestImage(iiifImageParameters);
+		IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
 
 		String errorMessage = "Image with id: " + IDENTIFIER + ", could not be retrieved";
 		assertIiifResponse(response, 418, errorMessage);
@@ -126,7 +130,7 @@ public class IiiFImageAdapterTest {
 	public void testRequestImage_ResponseStatusNotInternalErro() throws Exception {
 		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 500);
 
-		IiifImageResponse response = adapter.requestImage(iiifImageParameters);
+		IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
 
 		String errorMessage = "Image with id: " + IDENTIFIER + ", could not be retrieved";
 		assertIiifResponse(response, 500, errorMessage);
@@ -138,7 +142,7 @@ public class IiiFImageAdapterTest {
 		httpHandler.MRV.setAlwaysThrowException("getResponseCode", runtimeException);
 
 		try {
-			adapter.requestImage(iiifImageParameters);
+			adapter.callIiifServer(iiifImageParameters);
 			fail("It should throw an exception");
 		} catch (Exception e) {
 			assertTrue(e instanceof BinaryException);

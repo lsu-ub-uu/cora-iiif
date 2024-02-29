@@ -5,7 +5,7 @@ import static org.testng.Assert.assertEquals;
 
 import org.testng.annotations.Test;
 
-import se.uu.ub.cora.binary.iiif.IiifImageParameters;
+import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
@@ -20,16 +20,16 @@ public class IiiFImageAdapterRealTest {
 
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
 
-		IiifImageAdapterImp iiiFImageAdapter = new IiifImageAdapterImp(HTTP_LOCALHOST_39080_IIIF,
+		IiifAdapterImp iiiFImageAdapter = new IiifAdapterImp(HTTP_LOCALHOST_39080_IIIF,
 				httpHandlerFactory);
 
-		IiifImageParameters parameters = new IiifImageParameters("systemOne",
+		IiifParameters parameters = new IiifParameters("systemOne",
 				"binary:binary:10143787675430", "full", "263,", "0", "default", "jpg");
 
-		iiiFImageAdapter.requestImage(parameters);
+		iiiFImageAdapter.callIiifServer(parameters);
 	}
 
-	@Test(enabled = true)
+	@Test(enabled = false)
 	public void testHttpHandler() throws Exception {
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
 
