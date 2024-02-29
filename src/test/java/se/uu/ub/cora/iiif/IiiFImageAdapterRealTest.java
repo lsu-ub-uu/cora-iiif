@@ -1,3 +1,4 @@
+
 package se.uu.ub.cora.iiif;
 
 import static org.testng.Assert.assertEquals;
@@ -8,7 +9,6 @@ import se.uu.ub.cora.binary.iiif.IiifImageParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
-import se.uu.ub.cora.iiif.IiifImageAdapterImp;
 
 public class IiiFImageAdapterRealTest {
 
@@ -29,18 +29,21 @@ public class IiiFImageAdapterRealTest {
 		iiiFImageAdapter.requestImage(parameters);
 	}
 
-	@Test(enabled = false)
+	@Test(enabled = true)
 	public void testHttpHandler() throws Exception {
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
 
 		// String url = "http://systemone-iipimageserver:80/iiif/";
 		// String url =
 		// "http://systemone-fedora:8080/fcrepo/rest/systemOne/resource/binary:binary:20670231624729-master";
-		String url = "http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg";
+		// String url =
+		// "http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg";
+		String url = "http://localhost:8080/systemone/iiif/binary:binary:10143787675430/12288,8192,4096,4096/263,/0/default.jpg";
 		// String url = "https://www.svt.se";
 
 		HttpHandler httpHandler = httpHandlerFactory.factor(url);
 		httpHandler.setRequestMethod("GET");
+		httpHandler.setRequestProperty("headerName", "h1, h2, h3");
 
 		int responseCode = httpHandler.getResponseCode();
 
@@ -51,15 +54,18 @@ public class IiiFImageAdapterRealTest {
 	// to run
 
 	// Call to IIPserver works and the file is transfered when using only HTTP_1_1
-	// @Test(enabled = false)
+	// @Test(enabled = true)
 	// public void testUsingHTTP_1_1() throws Exception {
 	// HttpClient client = HttpClient.newBuilder().version(HttpClient.Version.HTTP_1_1)
 	// .connectTimeout(Duration.ofSeconds(10)).build();
 	//
-	// HttpRequest request = HttpRequest.newBuilder().uri(new URI(
+	// String url =
+	// "http://localhost:8080/systemone/iiif/binary:binary:10143787675430/12288,8192,4096,4096/263,/0/default.jpg";
+	// java.net.http.HttpRequest.Builder requetsBuilder = HttpRequest.newBuilder();
+	// requetsBuilder.headers("headerName", "h1", "headerName", "h2", "headerName", "h3");
+	// HttpRequest request = requetsBuilder.uri(new URI(url)).GET().build();
+	// //
 	// "http://systemone-iipimageserver:80/iiif/systemOne/binary:binary:29147131575073/full/263,/0/default.jpg"))
-	// .GET().build();
-	//
 	// HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
 	//
 	// System.out.println("Response Code: " + response.statusCode());
