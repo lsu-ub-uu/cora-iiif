@@ -18,8 +18,10 @@
  */
 package se.uu.ub.cora.iiif;
 
+import java.io.ByteArrayInputStream;
+import java.text.MessageFormat;
 import java.util.Map;
-import java.util.Optional;
+import java.util.Map.Entry;
 
 import se.uu.ub.cora.binary.BinaryException;
 import se.uu.ub.cora.binary.iiif.IiifAdapter;
@@ -39,29 +41,32 @@ public class IiifAdapterImp implements IiifAdapter {
 	}
 
 	@Override
-	public IiifAdapterResponse callIiifServer(IiifParameters iiifImageParameters) {
+	public IiifAdapterResponse callIiifServer(IiifParameters iiifParameters) {
 		try {
-			return tryToRequestImage(iiifImageParameters);
+			return tryToRequestImage(iiifParameters);
 		} catch (Exception e) {
-			throw BinaryException
-					.withMessageAndException("Error while requesting an image from server with id: "
-							+ iiifImageParameters.uri(), e);
+			throw errorWhileCallingIiifServer(e, iiifParameters);
 		}
 	}
 
-	private IiifAdapterResponse tryToRequestImage(IiifParameters iiifImageParameters) {
-		HttpHandler httpHandler = setUpRequest(iiifImageParameters);
+	private IiifAdapterResponse tryToRequestImage(IiifParameters iiifParameters) {
+		HttpHandler httpHandler = setUpRequest(iiifParameters);
 		int responseCode = call(httpHandler);
-		return requestResponse(iiifImageParameters, httpHandler, responseCode);
+		return requestResponse(httpHandler, responseCode);
 	}
 
-	private HttpHandler setUpRequest(IiifParameters iiifImageParameters) {
-		String requestUrl = buildRequestUrl(iiifImageParameters);
+	private HttpHandler setUpRequest(IiifParameters iiifParameters) {
+		String requestUrl = buildRequestUrl(iiifParameters);
 		HttpHandler httpHandler = httpHandlerFactory.factor(requestUrl);
-		httpHandler.setRequestMethod("GET");
-		// TODO: Set ALL headers from external call
-		httpHandler.setRequestProperty("Accept", "image/avif,image/webp,*/*");
+		httpHandler.setRequestMethod(iiifParameters.method());
+		setHeaders(httpHandler, iiifParameters.headersMap());
 		return httpHandler;
+	}
+
+	private void setHeaders(HttpHandler httpHandler, Map<String, String> headersMap) {
+		for (Entry<String, String> header : headersMap.entrySet()) {
+			httpHandler.setRequestProperty(header.getKey(), header.getValue());
+		}
 	}
 
 	private String buildRequestUrl(IiifParameters iiifImageParameters) {
@@ -72,55 +77,35 @@ public class IiifAdapterImp implements IiifAdapter {
 		return httpHandler.getResponseCode();
 	}
 
-	private IiifAdapterResponse requestResponse(IiifParameters iiifImageParameters,
-			HttpHandler httpHandler, int responseCode) {
-		if (responseNotOk(responseCode)) {
-			return returnNotOk(iiifImageParameters, httpHandler, responseCode);
-		}
-		return returnOk(httpHandler, responseCode);
-	}
-
-	private boolean responseNotOk(int responseCode) {
-		return responseCode != 200;
-	}
-
-	private IiifAdapterResponse returnNotOk(IiifParameters iiifImageParameters,
-			HttpHandler httpHandler, int responseCode) {
-		Map<String, Object> responseHeaders = httpHandler.getResponseHeaders();
+	private IiifAdapterResponse requestResponse(HttpHandler httpHandler, int responseCode) {
 		if (responseNotFound(responseCode)) {
-			return returnNotFound(iiifImageParameters, responseCode, responseHeaders);
+			return returnNotFound(responseCode, httpHandler.getResponseHeaders());
 		}
-		return returnAnyError(iiifImageParameters, responseCode, responseHeaders);
+		return returnResponse(httpHandler, responseCode);
 	}
 
 	private boolean responseNotFound(int responseCode) {
 		return responseCode == 404;
 	}
 
-	private IiifAdapterResponse returnNotFound(IiifParameters iiifImageParameters, int responseCode,
-			Map<String, Object> responseHeaders) {
-		var errorCode = Optional
-				.of("Image with path: " + iiifImageParameters.uri() + ", could not be found.");
-		return new IiifAdapterResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
+	private IiifAdapterResponse returnNotFound(int responseCode, Map<String, String> map) {
+		String errorMessage = "Requested identifier could not be found.";
+		return new IiifAdapterResponse(responseCode, map,
+				new ByteArrayInputStream(errorMessage.getBytes()));
 	}
 
-	private IiifAdapterResponse returnAnyError(IiifParameters iiifImageParameters, int responseCode,
-			Map<String, Object> responseHeaders) {
-		var errorCode = Optional.of(
-				"Image with id: " + iiifImageParameters.identifier() + ", could not be retrieved");
-		return new IiifAdapterResponse(responseCode, responseHeaders, Optional.empty(), errorCode);
-	}
-
-	private IiifAdapterResponse returnOk(HttpHandler httpHandler, int responseCode) {
+	private IiifAdapterResponse returnResponse(HttpHandler httpHandler, int responseCode) {
 		return new IiifAdapterResponse(responseCode, httpHandler.getResponseHeaders(),
 				httpHandler.getResponseBinary());
 	}
 
-	// @Override
-	// public IiifImageResponse requestInformation(String dataDivider, String identifier) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
+	private BinaryException errorWhileCallingIiifServer(Exception e,
+			IiifParameters iiifParameters) {
+		String errorMessage = "Error while calling iiifServer using method: {0}, and URI: {1}";
+		return BinaryException.withMessageAndException(
+				MessageFormat.format(errorMessage, iiifParameters.method(), iiifParameters.uri()),
+				e);
+	}
 
 	String onlyForTestGetIiifServerUrl() {
 		return iiifServerUrl;
@@ -129,4 +114,34 @@ public class IiifAdapterImp implements IiifAdapter {
 	HttpHandlerFactory onlyForTestGetHttpHandlerFactory() {
 		return httpHandlerFactory;
 	}
+
+	// private boolean responseNotOk(int responseCode) {
+	// return responseCode != 200;
+	// }
+
+	// private IiifAdapterResponse returnNotOk(IiifParameters iiifImageParameters,
+	// HttpHandler httpHandler, int responseCode) {
+	// Map<String, Object> responseHeaders = httpHandler.getResponseHeaders();
+	// if (responseNotFound(responseCode)) {
+	// return returnNotFound(iiifImageParameters, responseCode, responseHeaders);
+	// }
+	// return returnAnyError(iiifImageParameters, responseCode, responseHeaders);
+	// }
+
+	//
+	// private IiifAdapterResponse returnAnyError(IiifParameters iiifImageParameters, int
+	// responseCode,
+	// Map<String, Object> responseHeaders) {
+	// var errorCode = Optional.of(
+	// "Image with id: " + iiifImageParameters.identifier() + ", could not be retrieved");
+	// return new IiifAdapterResponse(responseCode, responseHeaders, inputStream);
+	// }
+	//
+
+	// @Override
+	// public IiifImageResponse requestInformation(String dataDivider, String identifier) {
+	// // TODO Auto-generated method stub
+	// return null;
+	// }
+
 }

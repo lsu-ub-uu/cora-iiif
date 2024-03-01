@@ -20,6 +20,7 @@ module se.uu.ub.cora.iiifadapter {
 	requires se.uu.ub.cora.httphandler;
 	requires se.uu.ub.cora.initialize;
 	requires se.uu.ub.cora.binary;
+	requires java.net.http;
 
 	provides se.uu.ub.cora.binary.iiif.IiifInstanceProvider with IiifImageInstanceProviderImp;
 
