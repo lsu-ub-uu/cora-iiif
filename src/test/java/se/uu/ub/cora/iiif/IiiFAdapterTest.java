@@ -43,7 +43,7 @@ import se.uu.ub.cora.httphandler.spies.HttpHandlerSpy;
 public class IiiFAdapterTest {
 
 	private static final String SOME_METHOD = "someMethod";
-	private static final String IIIF_SERVER_URL = "someIiifServerUrl";
+	private static final String IIIF_SERVER_URL = "someIiifServerUrl/";
 	private static final String SOME_URI = "someUri";
 	IiifAdapterImp adapter;
 	private HttpHandlerFactorySpy httpHandlerFactory;
@@ -162,7 +162,7 @@ public class IiiFAdapterTest {
 	}
 
 	private void assertUri() {
-		String expectedUrl = IIIF_SERVER_URL + "/" + SOME_URI;
+		String expectedUrl = IIIF_SERVER_URL + SOME_URI;
 
 		String iiifRequestUrl = (String) httpHandlerFactory.MCR
 				.getValueForMethodNameAndCallNumberAndParameterName("factor", 0, "url");

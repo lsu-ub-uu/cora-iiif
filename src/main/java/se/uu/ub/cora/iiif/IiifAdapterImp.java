@@ -70,7 +70,7 @@ public class IiifAdapterImp implements IiifAdapter {
 	}
 
 	private String buildRequestUrl(IiifParameters iiifImageParameters) {
-		return iiifServerUrl + "/" + iiifImageParameters.uri();
+		return iiifServerUrl + iiifImageParameters.uri();
 	}
 
 	private int call(HttpHandler httpHandler) {
@@ -114,34 +114,4 @@ public class IiifAdapterImp implements IiifAdapter {
 	HttpHandlerFactory onlyForTestGetHttpHandlerFactory() {
 		return httpHandlerFactory;
 	}
-
-	// private boolean responseNotOk(int responseCode) {
-	// return responseCode != 200;
-	// }
-
-	// private IiifAdapterResponse returnNotOk(IiifParameters iiifImageParameters,
-	// HttpHandler httpHandler, int responseCode) {
-	// Map<String, Object> responseHeaders = httpHandler.getResponseHeaders();
-	// if (responseNotFound(responseCode)) {
-	// return returnNotFound(iiifImageParameters, responseCode, responseHeaders);
-	// }
-	// return returnAnyError(iiifImageParameters, responseCode, responseHeaders);
-	// }
-
-	//
-	// private IiifAdapterResponse returnAnyError(IiifParameters iiifImageParameters, int
-	// responseCode,
-	// Map<String, Object> responseHeaders) {
-	// var errorCode = Optional.of(
-	// "Image with id: " + iiifImageParameters.identifier() + ", could not be retrieved");
-	// return new IiifAdapterResponse(responseCode, responseHeaders, inputStream);
-	// }
-	//
-
-	// @Override
-	// public IiifImageResponse requestInformation(String dataDivider, String identifier) {
-	// // TODO Auto-generated method stub
-	// return null;
-	// }
-
 }
