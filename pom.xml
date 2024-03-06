@@ -32,10 +32,10 @@
 
 	<properties>
 		<contentanalyzer.version>2.0-SNAPSHOT</contentanalyzer.version>
-		<httphandler.version>2.16-SNAPSHOT</httphandler.version>
+		<httphandler.version>2.16.0</httphandler.version>
 		<logger.version>2.10.0</logger.version>
 		<testutils.version>1.11.0</testutils.version>
-		<httphandler-spies.version>1.6-SNAPSHOT</httphandler-spies.version>
+		<httphandler-spies.version>1.6.0</httphandler-spies.version>
 		<logger-spies.version>1.6-SNAPSHOT</logger-spies.version>
 	</properties>
 
