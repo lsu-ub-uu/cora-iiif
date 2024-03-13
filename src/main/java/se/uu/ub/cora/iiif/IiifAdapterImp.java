@@ -19,6 +19,7 @@
 package se.uu.ub.cora.iiif;
 
 import java.io.ByteArrayInputStream;
+import java.io.UnsupportedEncodingException;
 import java.text.MessageFormat;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -32,6 +33,7 @@ import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 
 public class IiifAdapterImp implements IiifAdapter {
 
+	private static final int HTTP_NOT_FOUND = 404;
 	private HttpHandlerFactory httpHandlerFactory;
 	private String iiifServerUrl;
 
@@ -78,20 +80,26 @@ public class IiifAdapterImp implements IiifAdapter {
 	}
 
 	private IiifAdapterResponse requestResponse(HttpHandler httpHandler, int responseCode) {
-		if (responseNotFound(responseCode)) {
+		if (responseCode == HTTP_NOT_FOUND) {
 			return returnNotFound(responseCode, httpHandler.getResponseHeaders());
 		}
 		return returnResponse(httpHandler, responseCode);
 	}
 
-	private boolean responseNotFound(int responseCode) {
-		return responseCode == 404;
-	}
-
 	private IiifAdapterResponse returnNotFound(int responseCode, Map<String, String> map) {
 		String errorMessage = "Requested identifier could not be found.";
-		return new IiifAdapterResponse(responseCode, map,
-				new ByteArrayInputStream(errorMessage.getBytes()));
+		try {
+			ByteArrayInputStream inputStreamResponse = new ByteArrayInputStream(
+					getBytesUsingEncoding(errorMessage, "UTF-8"));
+			return new IiifAdapterResponse(responseCode, map, inputStreamResponse);
+		} catch (Exception e) {
+			throw BinaryException.withMessage("Unsupported encoding " + e.getMessage());
+		}
+	}
+
+	byte[] getBytesUsingEncoding(String errorMessage, String encoding)
+			throws UnsupportedEncodingException {
+		return errorMessage.getBytes(encoding);
 	}
 
 	private IiifAdapterResponse returnResponse(HttpHandler httpHandler, int responseCode) {

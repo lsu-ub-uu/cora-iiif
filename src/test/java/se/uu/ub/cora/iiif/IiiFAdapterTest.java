@@ -27,9 +27,11 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
@@ -37,8 +39,11 @@ import org.testng.annotations.Test;
 import se.uu.ub.cora.binary.BinaryException;
 import se.uu.ub.cora.binary.iiif.IiifAdapterResponse;
 import se.uu.ub.cora.binary.iiif.IiifParameters;
+import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerFactorySpy;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerSpy;
+import se.uu.ub.cora.testutils.mcr.MethodCallRecorder;
+import se.uu.ub.cora.testutils.mrv.MethodReturnValues;
 
 public class IiiFAdapterTest {
 
@@ -78,6 +83,60 @@ public class IiiFAdapterTest {
 		assertBody(response.body(), errorMessage);
 	}
 
+	@Test
+	public void testRequestImage_ResponseStatusNotFound_UseUtf8Encoding() throws Exception {
+		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 404);
+		IiifAdapterImpOnlyForTest adapter = new IiifAdapterImpOnlyForTest(IIIF_SERVER_URL,
+				httpHandlerFactory);
+
+		adapter.callIiifServer(iiifImageParameters);
+
+		adapter.MCR.assertParameter("getBytesUsingEncoding", 0, "encoding", "UTF-8");
+	}
+
+	@Test
+	public void testRequestImage_ResponseStatusNotFound_UnsupportedEncoding() throws Exception {
+		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 404);
+		IiifAdapterImpOnlyForTest adapter = new IiifAdapterImpOnlyForTest(IIIF_SERVER_URL,
+				httpHandlerFactory);
+		adapter.throwUnsupportedEncodingException = Optional
+				.of(new UnsupportedEncodingException("someUnsupportedEncodingException"));
+
+		try {
+			adapter.callIiifServer(iiifImageParameters);
+			fail("It should Throw an exception");
+		} catch (Exception e) {
+			assertTrue(e instanceof BinaryException);
+			assertEquals(e.getCause().getMessage(),
+					"Unsupported encoding someUnsupportedEncodingException");
+		}
+	}
+
+	class IiifAdapterImpOnlyForTest extends IiifAdapterImp {
+		public MethodCallRecorder MCR = new MethodCallRecorder();
+		public MethodReturnValues MRV = new MethodReturnValues();
+		public Optional<UnsupportedEncodingException> throwUnsupportedEncodingException = Optional
+				.empty();
+
+		public IiifAdapterImpOnlyForTest(String iiifServerUrl,
+				HttpHandlerFactory httpHandlerFactory) {
+			super(iiifServerUrl, httpHandlerFactory);
+
+			MCR.useMRV(MRV);
+			MRV.setDefaultReturnValuesSupplier("getBytesUsingEncoding", () -> new byte[] {});
+		}
+
+		@Override
+		byte[] getBytesUsingEncoding(String errorMessage, String encoding)
+				throws UnsupportedEncodingException {
+			if (throwUnsupportedEncodingException.isPresent()) {
+				throw throwUnsupportedEncodingException.get();
+			}
+			return (byte[]) MCR.addCallAndReturnFromMRV("errorMessage", errorMessage, "encoding",
+					encoding);
+		}
+	}
+
 	private void assertBody(InputStream inputStream, String expected) throws IOException {
 		String actual = convertInputStreamToString(inputStream);
 		assertEquals(actual, expected);
@@ -98,25 +157,6 @@ public class IiiFAdapterTest {
 		}
 		return textBuilder.toString();
 	}
-
-	// @Test
-	// public void testRequestImage_ResponseStatusNotOk() throws Exception {
-	// httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 418);
-	//
-	// IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
-	//
-	// assertEquals(response.status(), 418);
-	// }
-	//
-	// @Test
-	// public void testRequestImage_ResponseStatusNotInternalErro() throws Exception {
-	// httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 500);
-	//
-	// IiifAdapterResponse response = adapter.callIiifServer(iiifImageParameters);
-	//
-	// String errorMessage = "Image with id: " + IDENTIFIER + ", could not be retrieved";
-	// assertIiifResponse(response, 500, errorMessage);
-	// }
 
 	@Test
 	public void testRequestImage_UnexpectedException() throws Exception {
