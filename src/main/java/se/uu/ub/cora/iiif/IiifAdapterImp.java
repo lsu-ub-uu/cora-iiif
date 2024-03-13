@@ -86,20 +86,29 @@ public class IiifAdapterImp implements IiifAdapter {
 		return returnResponse(httpHandler, responseCode);
 	}
 
-	private IiifAdapterResponse returnNotFound(int responseCode, Map<String, String> map) {
-		String errorMessage = "Requested identifier could not be found.";
+	private IiifAdapterResponse returnNotFound(int responseCode, Map<String, String> headers) {
 		try {
-			ByteArrayInputStream inputStreamResponse = new ByteArrayInputStream(
-					getBytesUsingEncoding(errorMessage, "UTF-8"));
-			return new IiifAdapterResponse(responseCode, map, inputStreamResponse);
+			return tryToCreateNotFoundResponse(responseCode, headers);
 		} catch (Exception e) {
 			throw BinaryException.withMessage("Unsupported encoding " + e.getMessage());
 		}
 	}
 
-	byte[] getBytesUsingEncoding(String errorMessage, String encoding)
+	private IiifAdapterResponse tryToCreateNotFoundResponse(int responseCode,
+			Map<String, String> headers) throws UnsupportedEncodingException {
+		ByteArrayInputStream inputStreamResponse = tryToCreateNotFoundResponsMessageInBytes();
+		return new IiifAdapterResponse(responseCode, headers, inputStreamResponse);
+	}
+
+	private ByteArrayInputStream tryToCreateNotFoundResponsMessageInBytes()
 			throws UnsupportedEncodingException {
-		return errorMessage.getBytes(encoding);
+		return new ByteArrayInputStream(
+				createErrorMessageInBytesUsingEncoding("UTF-8"));
+	}
+
+	byte[] createErrorMessageInBytesUsingEncoding(String encoding) throws UnsupportedEncodingException {
+		return "Requested identifier could not be found.".getBytes(encoding);
+
 	}
 
 	private IiifAdapterResponse returnResponse(HttpHandler httpHandler, int responseCode) {

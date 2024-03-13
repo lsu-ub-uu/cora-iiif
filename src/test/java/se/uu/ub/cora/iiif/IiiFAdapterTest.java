@@ -91,7 +91,7 @@ public class IiiFAdapterTest {
 
 		adapter.callIiifServer(iiifImageParameters);
 
-		adapter.MCR.assertParameter("getBytesUsingEncoding", 0, "encoding", "UTF-8");
+		adapter.MCR.assertParameters("createErrorMessageInBytesUsingEncoding", 0, "UTF-8");
 	}
 
 	@Test
@@ -123,17 +123,17 @@ public class IiiFAdapterTest {
 			super(iiifServerUrl, httpHandlerFactory);
 
 			MCR.useMRV(MRV);
-			MRV.setDefaultReturnValuesSupplier("getBytesUsingEncoding", () -> new byte[] {});
+			MRV.setDefaultReturnValuesSupplier("createErrorMessageInBytesUsingEncoding",
+					() -> new byte[] {});
 		}
 
 		@Override
-		byte[] getBytesUsingEncoding(String errorMessage, String encoding)
+		byte[] createErrorMessageInBytesUsingEncoding(String encoding)
 				throws UnsupportedEncodingException {
 			if (throwUnsupportedEncodingException.isPresent()) {
 				throw throwUnsupportedEncodingException.get();
 			}
-			return (byte[]) MCR.addCallAndReturnFromMRV("errorMessage", errorMessage, "encoding",
-					encoding);
+			return (byte[]) MCR.addCallAndReturnFromMRV("encoding", encoding);
 		}
 	}
 
