@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Uppsala University Library
+ * Copyright 2024, 2025 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -26,14 +26,14 @@ import java.util.Map;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.basicstorage.path.StreamPathBuilderImp;
 import se.uu.ub.cora.binary.iiif.IiifAdapter;
 import se.uu.ub.cora.binary.iiif.IiifInstanceProvider;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
-import se.uu.ub.cora.iiif.IiifAdapterImp;
-import se.uu.ub.cora.iiif.IiifImageInstanceProviderImp;
 import se.uu.ub.cora.initialize.SettingsProvider;
 import se.uu.ub.cora.logger.LoggerProvider;
 import se.uu.ub.cora.logger.spies.LoggerFactorySpy;
+import se.uu.ub.cora.storage.hash.imp.CoraDigestorImp;
 
 public class IiifImageInstanceProviderTest {
 	private IiifInstanceProvider provider;
@@ -50,21 +50,23 @@ public class IiifImageInstanceProviderTest {
 	private void setExternalProviders() {
 		loggerFactory = new LoggerFactorySpy();
 		LoggerProvider.setLoggerFactory(loggerFactory);
-		SettingsProvider.setSettings(Map.of("imageServerUrl", "someUrl"));
+		Map<String, String> settings = Map.of("imageServerUrl", "someUrl", "storageOnDiskBasePath",
+				"someBasePath");
+		SettingsProvider.setSettings(settings);
 	}
 
 	@Test
-	public void testInstanceOf() throws Exception {
+	public void testInstanceOf() {
 		assertTrue(provider instanceof IiifInstanceProvider);
 	}
 
 	@Test
-	public void testGetOrderToSelectImplementionsBy() throws Exception {
+	public void testGetOrderToSelectImplementionsBy() {
 		assertEquals(provider.getOrderToSelectImplementionsBy(), 0);
 	}
 
 	@Test
-	public void getIiifImageAdapter() throws Exception {
+	public void getIiifImageAdapter() {
 
 		IiifAdapterImp iiifImageAdapter = (IiifAdapterImp) provider.getIiifAdapter();
 
@@ -72,6 +74,15 @@ public class IiifImageInstanceProviderTest {
 		assertTrue(
 				iiifImageAdapter.onlyForTestGetHttpHandlerFactory() instanceof HttpHandlerFactory);
 		assertEquals(iiifImageAdapter.onlyForTestGetIiifServerUrl(), "someUrl");
+		StreamPathBuilderImp streamPathBuilder = (StreamPathBuilderImp) iiifImageAdapter
+				.onlyForTestGetStreamPathBuilder();
+
+		assertTrue(streamPathBuilder instanceof StreamPathBuilderImp);
+
+		assertEquals(streamPathBuilder.onlyForTestGetFileSystemBasePath(),
+				SettingsProvider.getSetting("storageOnDiskBasePath"));
+		assertTrue(streamPathBuilder.onlyForTestGetCoraDigestor() instanceof CoraDigestorImp);
+
 	}
 
 }
