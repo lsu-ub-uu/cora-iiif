@@ -31,15 +31,15 @@
 	<name>IIIF image API adapter</name>
 
 	<properties>
-		<contentanalyzer.version>2.1-SNAPSHOT</contentanalyzer.version>
+		<contentanalyzer.version>2.1.0</contentanalyzer.version>
 		<httphandler.version>2.17.0</httphandler.version>
 		<logger.version>2.10.0</logger.version>
 		<logger-spies.version>1.5.0</logger-spies.version>
 		<testutils.version>1.14.0</testutils.version>
 		<httphandler-spies.version>1.7.0</httphandler-spies.version>
-		<storage.version>9.9-SNAPSHOT</storage.version>
-		<basicstorage.version>7.18-SNAPSHOT</basicstorage.version>
-		<storage-spies.version>1.15-SNAPSHOT</storage-spies.version>
+		<storage.version>9.9.0</storage.version>
+		<basicstorage.version>7.18.0</basicstorage.version>
+		<storage-spies.version>1.15.0</storage-spies.version>
 		<coradata.version>11.0.0</coradata.version>
 		<json.version>3.10.0</json.version>
 	</properties>
