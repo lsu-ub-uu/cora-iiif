@@ -81,7 +81,6 @@ public class IiifAdapterImp implements IiifAdapter {
 				iiifImageParameters.representation());
 		String pathToAFileWith = pathToAFile.replaceFirst("/", "");
 		String requestUrl = iiifServerUrl + pathToAFileWith + "/" + iiifImageParameters.uri();
-		System.err.println(requestUrl);
 		return requestUrl;
 	}
 
