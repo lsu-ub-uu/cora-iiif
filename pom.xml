@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>se.uu.ub.cora</groupId>
 		<artifactId>cora-parent</artifactId>
-		<version>2.5.0</version>
+		<version>2.9.0</version>
 	</parent>
 
 	<artifactId>iiif</artifactId>
@@ -31,12 +31,17 @@
 	<name>IIIF image API adapter</name>
 
 	<properties>
-		<contentanalyzer.version>2.0.0</contentanalyzer.version>
-		<httphandler.version>2.16.0</httphandler.version>
+		<contentanalyzer.version>2.1-SNAPSHOT</contentanalyzer.version>
+		<httphandler.version>2.17.0</httphandler.version>
 		<logger.version>2.10.0</logger.version>
-		<testutils.version>1.11.0</testutils.version>
-		<httphandler-spies.version>1.6.0</httphandler-spies.version>
 		<logger-spies.version>1.5.0</logger-spies.version>
+		<testutils.version>1.14.0</testutils.version>
+		<httphandler-spies.version>1.7.0</httphandler-spies.version>
+		<storage.version>9.9-SNAPSHOT</storage.version>
+		<basicstorage.version>7.18-SNAPSHOT</basicstorage.version>
+		<storage-spies.version>1.15-SNAPSHOT</storage-spies.version>
+		<coradata.version>11.0.0</coradata.version>
+		<json.version>3.10.0</json.version>
 	</properties>
 
 	<scm>
@@ -88,6 +93,36 @@
 			<artifactId>logger-spies</artifactId>
 			<version>${logger-spies.version}</version>
 			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>storage</artifactId>
+			<version>${storage.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>basicstorage</artifactId>
+			<version>${basicstorage.version}</version>
+			<scope>compile</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>storage-spies</artifactId>
+			<version>${storage-spies.version}</version>
+			<scope>test</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>coradata</artifactId>
+			<version>${coradata.version}</version>
+			<scope>provided</scope>
+		</dependency>
+		<dependency>
+			<groupId>se.uu.ub.cora</groupId>
+			<artifactId>json</artifactId>
+			<version>${json.version}</version>
+			<scope>provided</scope>
 		</dependency>
 	</dependencies>
 </project>

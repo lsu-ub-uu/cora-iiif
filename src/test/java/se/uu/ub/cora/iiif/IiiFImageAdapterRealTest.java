@@ -13,10 +13,13 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.basicstorage.path.StreamPathBuilderImp;
 import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
+import se.uu.ub.cora.initialize.SettingsProvider;
+import se.uu.ub.cora.storage.hash.imp.CoraDigestorImp;
 
 public class IiiFImageAdapterRealTest {
 
@@ -27,13 +30,17 @@ public class IiiFImageAdapterRealTest {
 	public void testName() throws Exception {
 
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
-
+		String basePath = SettingsProvider.getSetting("storageOnDiskBasePath");
+		StreamPathBuilderImp streamPathBuilder = StreamPathBuilderImp
+				.usingBasePathAndCoraDigestor(basePath, new CoraDigestorImp());
 		IiifAdapterImp iiiFImageAdapter = new IiifAdapterImp(HTTP_LOCALHOST_39080_IIIF,
-				httpHandlerFactory);
+				httpHandlerFactory, streamPathBuilder);
 
 		Map<String, String> headers = new HashMap<>();
-		IiifParameters parameters = new IiifParameters("systemOne/binary:binary:10143787675430",
-				"GET", headers);
+		// IiifParameters parameters = new IiifParameters("systemOne/binary:binary:10143787675430",
+		// "GET", headers);
+		IiifParameters parameters = new IiifParameters("systemOne", "binary",
+				"binary:10143787675430", "jp2", "", "GET", headers);
 
 		headers.put("Accept-Encoding", "gzip, deflate, br");
 		//

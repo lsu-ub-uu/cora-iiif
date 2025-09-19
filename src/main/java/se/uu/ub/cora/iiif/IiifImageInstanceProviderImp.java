@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Uppsala University Library
+ * Copyright 2024, 2025 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -18,10 +18,12 @@
  */
 package se.uu.ub.cora.iiif;
 
+import se.uu.ub.cora.basicstorage.path.StreamPathBuilderImp;
 import se.uu.ub.cora.binary.iiif.IiifAdapter;
 import se.uu.ub.cora.binary.iiif.IiifInstanceProvider;
 import se.uu.ub.cora.httphandler.HttpHandlerFactoryImp;
 import se.uu.ub.cora.initialize.SettingsProvider;
+import se.uu.ub.cora.storage.hash.imp.CoraDigestorImp;
 
 public class IiifImageInstanceProviderImp implements IiifInstanceProvider {
 
@@ -34,8 +36,11 @@ public class IiifImageInstanceProviderImp implements IiifInstanceProvider {
 	public IiifAdapter getIiifAdapter() {
 		HttpHandlerFactoryImp httpHandlerFactory = new HttpHandlerFactoryImp();
 
-		return new IiifAdapterImp(SettingsProvider.getSetting("imageServerUrl"),
-				httpHandlerFactory);
-	}
+		String basePath = SettingsProvider.getSetting("storageOnDiskBasePath");
+		StreamPathBuilderImp streamPathBuilder = StreamPathBuilderImp
+				.usingBasePathAndCoraDigestor(basePath, new CoraDigestorImp());
 
+		return new IiifAdapterImp(SettingsProvider.getSetting("imageServerUrl"), httpHandlerFactory,
+				streamPathBuilder);
+	}
 }

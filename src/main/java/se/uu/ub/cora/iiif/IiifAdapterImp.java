@@ -1,5 +1,5 @@
 /*
- * Copyright 2024 Uppsala University Library
+ * Copyright 2024, 2025 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -30,16 +30,20 @@ import se.uu.ub.cora.binary.iiif.IiifAdapterResponse;
 import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
+import se.uu.ub.cora.storage.StreamPathBuilder;
 
 public class IiifAdapterImp implements IiifAdapter {
 
 	private static final int HTTP_NOT_FOUND = 404;
 	private HttpHandlerFactory httpHandlerFactory;
 	private String iiifServerUrl;
+	private StreamPathBuilder streamPathBuilder;
 
-	public IiifAdapterImp(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory) {
+	public IiifAdapterImp(String iiifServerUrl, HttpHandlerFactory httpHandlerFactory,
+			StreamPathBuilder streamPathBuilder) {
 		this.iiifServerUrl = iiifServerUrl;
 		this.httpHandlerFactory = httpHandlerFactory;
+		this.streamPathBuilder = streamPathBuilder;
 	}
 
 	@Override
@@ -72,7 +76,12 @@ public class IiifAdapterImp implements IiifAdapter {
 	}
 
 	private String buildRequestUrl(IiifParameters iiifImageParameters) {
-		return iiifServerUrl + iiifImageParameters.uri();
+		String pathToAFile = streamPathBuilder.buildPathToAFile(iiifImageParameters.dataDivider(),
+				iiifImageParameters.type(), iiifImageParameters.id(),
+				iiifImageParameters.representation());
+		String pathToAFileWith = pathToAFile.replaceFirst("/", "");
+		String requestUrl = iiifServerUrl + pathToAFileWith + "/" + iiifImageParameters.uri();
+		return requestUrl;
 	}
 
 	private int call(HttpHandler httpHandler) {
@@ -102,11 +111,11 @@ public class IiifAdapterImp implements IiifAdapter {
 
 	private ByteArrayInputStream tryToCreateNotFoundResponsMessageInBytes()
 			throws UnsupportedEncodingException {
-		return new ByteArrayInputStream(
-				createErrorMessageInBytesUsingEncoding("UTF-8"));
+		return new ByteArrayInputStream(createErrorMessageInBytesUsingEncoding("UTF-8"));
 	}
 
-	byte[] createErrorMessageInBytesUsingEncoding(String encoding) throws UnsupportedEncodingException {
+	byte[] createErrorMessageInBytesUsingEncoding(String encoding)
+			throws UnsupportedEncodingException {
 		return "Requested identifier could not be found.".getBytes(encoding);
 
 	}
@@ -130,5 +139,9 @@ public class IiifAdapterImp implements IiifAdapter {
 
 	HttpHandlerFactory onlyForTestGetHttpHandlerFactory() {
 		return httpHandlerFactory;
+	}
+
+	public StreamPathBuilder onlyForTestGetStreamPathBuilder() {
+		return streamPathBuilder;
 	}
 }

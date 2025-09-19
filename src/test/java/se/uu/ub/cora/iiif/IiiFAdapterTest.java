@@ -19,6 +19,7 @@
 package se.uu.ub.cora.iiif;
 
 import static org.testng.Assert.assertEquals;
+import static org.testng.Assert.assertSame;
 import static org.testng.Assert.assertTrue;
 import static org.testng.Assert.fail;
 
@@ -42,19 +43,25 @@ import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandlerFactory;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerFactorySpy;
 import se.uu.ub.cora.httphandler.spies.HttpHandlerSpy;
+import se.uu.ub.cora.storage.spies.path.StreamPathBuilderSpy;
 import se.uu.ub.cora.testutils.mcr.MethodCallRecorder;
 import se.uu.ub.cora.testutils.mrv.MethodReturnValues;
 
 public class IiiFAdapterTest {
 
-	private static final String SOME_METHOD = "someMethod";
+	private static final String DATA_DIVIDER = "someDataDivider";
+	private static final String TYPE = "someType";
+	private static final String ID = "someId";
+	private static final String REPRESENTATION = "someRepresentation";
+	private static final String METHOD = "someMethod";
 	private static final String IIIF_SERVER_URL = "someIiifServerUrl/";
-	private static final String SOME_URI = "someUri";
+	private static final String URI = "someUri";
 	IiifAdapterImp adapter;
 	private HttpHandlerFactorySpy httpHandlerFactory;
 	private IiifParameters iiifImageParameters;
 	private HttpHandlerSpy httpHandler;
 	private Map<String, String> headersMap;
+	private StreamPathBuilderSpy streamPathBuilder;
 
 	@BeforeMethod
 	private void beforeMethod() {
@@ -65,9 +72,13 @@ public class IiiFAdapterTest {
 
 		headersMap = new LinkedHashMap<>();
 
-		iiifImageParameters = new IiifParameters(SOME_URI, SOME_METHOD, headersMap);
+		iiifImageParameters = new IiifParameters(DATA_DIVIDER, TYPE, ID, REPRESENTATION, URI,
+				METHOD, headersMap);
 
-		adapter = new IiifAdapterImp(IIIF_SERVER_URL, httpHandlerFactory);
+		streamPathBuilder = new StreamPathBuilderSpy();
+		streamPathBuilder.MRV.setDefaultReturnValuesSupplier("buildPathToAFile", () -> "/somPath");
+
+		adapter = new IiifAdapterImp(IIIF_SERVER_URL, httpHandlerFactory, streamPathBuilder);
 
 	}
 
@@ -84,18 +95,18 @@ public class IiiFAdapterTest {
 	}
 
 	@Test
-	public void testRequestImage_ResponseStatusNotFound_UseUtf8Encoding() throws Exception {
+	public void testRequestImage_ResponseStatusNotFound_UseUtf8Encoding() {
 		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 404);
-		IiifAdapterImpOnlyForTest adapter = new IiifAdapterImpOnlyForTest(IIIF_SERVER_URL,
+		IiifAdapterImpOnlyForTest iifAdapter = new IiifAdapterImpOnlyForTest(IIIF_SERVER_URL,
 				httpHandlerFactory);
 
-		adapter.callIiifServer(iiifImageParameters);
+		iifAdapter.callIiifServer(iiifImageParameters);
 
-		adapter.MCR.assertParameters("createErrorMessageInBytesUsingEncoding", 0, "UTF-8");
+		iifAdapter.MCR.assertParameters("createErrorMessageInBytesUsingEncoding", 0, "UTF-8");
 	}
 
 	@Test
-	public void testRequestImage_ResponseStatusNotFound_UnsupportedEncoding() throws Exception {
+	public void testRequestImage_ResponseStatusNotFound_UnsupportedEncoding() {
 		httpHandler.MRV.setDefaultReturnValuesSupplier("getResponseCode", () -> 404);
 		IiifAdapterImpOnlyForTest adapter = new IiifAdapterImpOnlyForTest(IIIF_SERVER_URL,
 				httpHandlerFactory);
@@ -120,7 +131,7 @@ public class IiiFAdapterTest {
 
 		public IiifAdapterImpOnlyForTest(String iiifServerUrl,
 				HttpHandlerFactory httpHandlerFactory) {
-			super(iiifServerUrl, httpHandlerFactory);
+			super(iiifServerUrl, httpHandlerFactory, streamPathBuilder);
 
 			MCR.useMRV(MRV);
 			MRV.setDefaultReturnValuesSupplier("createErrorMessageInBytesUsingEncoding",
@@ -159,7 +170,7 @@ public class IiiFAdapterTest {
 	}
 
 	@Test
-	public void testRequestImage_UnexpectedException() throws Exception {
+	public void testRequestImage_UnexpectedException() {
 		RuntimeException runtimeException = new RuntimeException();
 		httpHandler.MRV.setAlwaysThrowException("getResponseCode", runtimeException);
 
@@ -168,14 +179,14 @@ public class IiiFAdapterTest {
 			fail("It should throw an exception");
 		} catch (Exception e) {
 			assertTrue(e instanceof BinaryException);
-			assertEquals(e.getMessage(), "Error while calling iiifServer using method: "
-					+ SOME_METHOD + ", and URI: " + SOME_URI);
+			assertEquals(e.getMessage(),
+					"Error while calling iiifServer using method: " + METHOD + ", and URI: " + URI);
 			assertEquals(e.getCause(), runtimeException);
 		}
 	}
 
 	@Test
-	public void testRequestImage_OK() throws Exception {
+	public void testRequestImage_OK() {
 		headersMap.put("someHeader", "someValue1, someValue2");
 		headersMap.put("someOtherHeader", "someOtherValue1");
 
@@ -183,7 +194,7 @@ public class IiiFAdapterTest {
 
 		assertMethod();
 		assertHeaders();
-		assertUri();
+		assertRequestUrl();
 
 		httpHandler.MCR.assertReturn("getResponseCode", 0, response.status());
 		httpHandler.MCR.assertReturn("getResponseHeaders", 0, response.headers());
@@ -191,7 +202,7 @@ public class IiiFAdapterTest {
 	}
 
 	private void assertMethod() {
-		httpHandler.MCR.assertParameters("setRequestMethod", 0, SOME_METHOD);
+		httpHandler.MCR.assertParameters("setRequestMethod", 0, METHOD);
 	}
 
 	private void assertHeaders() {
@@ -201,12 +212,18 @@ public class IiiFAdapterTest {
 				"someOtherValue1");
 	}
 
-	private void assertUri() {
-		String expectedUrl = IIIF_SERVER_URL + SOME_URI;
+	private void assertRequestUrl() {
+		String expectedUrl = (String) streamPathBuilder.MCR.assertCalledParametersReturn(
+				"buildPathToAFile", DATA_DIVIDER, TYPE, ID, REPRESENTATION);
 
-		String iiifRequestUrl = (String) httpHandlerFactory.MCR
-				.getValueForMethodNameAndCallNumberAndParameterName("factor", 0, "url");
+		httpHandlerFactory.MCR.assertParameters("factor", 0,
+				IIIF_SERVER_URL + expectedUrl.replaceFirst("/", "") + "/someUri");
+	}
 
-		assertEquals(iiifRequestUrl, expectedUrl);
+	@Test
+	public void testOnlyForTests() {
+		assertSame(adapter.onlyForTestGetHttpHandlerFactory(), httpHandlerFactory);
+		assertSame(adapter.onlyForTestGetIiifServerUrl(), IIIF_SERVER_URL);
+		assertSame(adapter.onlyForTestGetStreamPathBuilder(), streamPathBuilder);
 	}
 }
