@@ -22,7 +22,7 @@
 	<parent>
 		<groupId>se.uu.ub.cora</groupId>
 		<artifactId>cora-parent</artifactId>
-		<version>2.9.0</version>
+		<version>3.2.0</version>
 	</parent>
 
 	<artifactId>iiif</artifactId>
@@ -37,11 +37,11 @@
 		<logger-spies.version>1.5.0</logger-spies.version>
 		<testutils.version>1.14.0</testutils.version>
 		<httphandler-spies.version>1.7.0</httphandler-spies.version>
-		<storage.version>9.9.0</storage.version>
-		<basicstorage.version>7.18.0</basicstorage.version>
+		<storage.version>10.0.0</storage.version>
+		<basicstorage.version>7.20.0</basicstorage.version>
 		<storage-spies.version>1.15.0</storage-spies.version>
-		<coradata.version>11.0.0</coradata.version>
-		<json.version>3.10.0</json.version>
+		<coradata.version>11.2.0</coradata.version>
+		<json.version>3.11.0</json.version>
 	</properties>
 
 	<scm>

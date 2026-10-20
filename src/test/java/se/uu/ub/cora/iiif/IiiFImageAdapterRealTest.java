@@ -13,6 +13,8 @@ import java.util.Map;
 
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.basicstorage.path.PathFileSystem;
+import se.uu.ub.cora.basicstorage.path.PathFileSystemImp;
 import se.uu.ub.cora.basicstorage.path.StreamPathBuilderImp;
 import se.uu.ub.cora.binary.iiif.IiifParameters;
 import se.uu.ub.cora.httphandler.HttpHandler;
@@ -28,11 +30,13 @@ public class IiiFImageAdapterRealTest {
 
 	@Test(enabled = false)
 	public void testName() throws Exception {
+		PathFileSystem pathFileSystem = PathFileSystemImp.usingRealFileSystem();
 
 		HttpHandlerFactory httpHandlerFactory = new HttpHandlerFactoryImp();
 		String basePath = SettingsProvider.getSetting("storageOnDiskBasePath");
 		StreamPathBuilderImp streamPathBuilder = StreamPathBuilderImp
-				.usingBasePathAndCoraDigestor(basePath, new CoraDigestorImp());
+				.usingBasePathAndCoraDigestorAndPathFileSystem(basePath, new CoraDigestorImp(),
+						pathFileSystem);
 		IiifAdapterImp iiiFImageAdapter = new IiifAdapterImp(HTTP_LOCALHOST_39080_IIIF,
 				httpHandlerFactory, streamPathBuilder);
 

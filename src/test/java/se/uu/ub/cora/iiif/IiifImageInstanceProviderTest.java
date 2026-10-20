@@ -1,5 +1,5 @@
 /*
- * Copyright 2024, 2025 Uppsala University Library
+ * Copyright 2024, 2025, 2026 Uppsala University Library
  *
  * This file is part of Cora.
  *
@@ -26,6 +26,7 @@ import java.util.Map;
 import org.testng.annotations.BeforeMethod;
 import org.testng.annotations.Test;
 
+import se.uu.ub.cora.basicstorage.path.PathFileSystemImp;
 import se.uu.ub.cora.basicstorage.path.StreamPathBuilderImp;
 import se.uu.ub.cora.binary.iiif.IiifAdapter;
 import se.uu.ub.cora.binary.iiif.IiifInstanceProvider;
@@ -82,6 +83,7 @@ public class IiifImageInstanceProviderTest {
 		assertEquals(streamPathBuilder.onlyForTestGetFileSystemBasePath(),
 				SettingsProvider.getSetting("storageOnDiskBasePath"));
 		assertTrue(streamPathBuilder.onlyForTestGetCoraDigestor() instanceof CoraDigestorImp);
+		assertTrue(streamPathBuilder.onlyForTestGetPathFileSystem() instanceof PathFileSystemImp);
 
 	}
 
